@@ -7,7 +7,7 @@
 getTimeSeriesInfo(loc_ids)
 }
 \arguments{
-\item{loc_id}{Location identifier}
+\item{loc_ids}{Character vector of location identifier(s)}
 }
 \value{
 A tibble with one line per dataset

@@ -2,3 +2,7 @@
 ^\.Rproj\.user$
 ^LICENSE\.md$
 temp_delete.*
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^\.github$

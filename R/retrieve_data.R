@@ -1,4 +1,5 @@
 #' @importFrom magrittr %>% %<>%
+#' @importFrom methods new
 
 # Create package environment to store global vars
 pkg_globals <- new.env(parent = emptyenv())
@@ -118,7 +119,7 @@ getLocationInfo <- function(search_string, folder, include_subfolders = TRUE) {
 
 #' Get list of datasets at a location
 #'
-#' @param loc_id Location identifier
+#' @param loc_ids Character vector of location identifier(s)
 #'
 #' @return A tibble with one line per dataset
 #' @export
@@ -176,15 +177,15 @@ getTimeSeries <- function(ts_id, start, end) {
   dataset$TimeRange$StartTime <- try(parsedate::parse_iso_8601(dataset$TimeRange$StartTime))
   dataset$TimeRange$EndTime <- try(parsedate::parse_iso_8601(dataset$TimeRange$EndTime))
   dataset$ResponseTime <- try(parsedate::parse_iso_8601(dataset$ResponseTime))
-  dataset$Approvals <- try(dplyr::mutate(dataset$Approvals, across(c("DateAppliedUtc", "StartTime", "EndTime"), parsedate::parse_iso_8601)) %>%
+  dataset$Approvals <- try(dplyr::mutate(dataset$Approvals, dplyr::across(c("DateAppliedUtc", "StartTime", "EndTime"), parsedate::parse_iso_8601)) %>%
     tibble::as_tibble())
-  dataset$Methods <- try(dplyr::mutate(dataset$Methods, across(c("StartTime", "EndTime"), parsedate::parse_iso_8601)) %>%
+  dataset$Methods <- try(dplyr::mutate(dataset$Methods, dplyr::across(c("StartTime", "EndTime"), parsedate::parse_iso_8601)) %>%
     tibble::as_tibble())
-  dataset$Grades <- try(dplyr::mutate(dataset$Grades, across(c("StartTime", "EndTime"), parsedate::parse_iso_8601)) %>%
+  dataset$Grades <- try(dplyr::mutate(dataset$Grades, dplyr::across(c("StartTime", "EndTime"), parsedate::parse_iso_8601)) %>%
     tibble::as_tibble())
-  dataset$GapTolerances <- try(dplyr::mutate(dataset$GapTolerances, across(c("StartTime", "EndTime"), parsedate::parse_iso_8601)) %>%
+  dataset$GapTolerances <- try(dplyr::mutate(dataset$GapTolerances, dplyr::across(c("StartTime", "EndTime"), parsedate::parse_iso_8601)) %>%
     tibble::as_tibble())
-  dataset$InterpolationTypes <- try(dplyr::mutate(dataset$InterpolationTypes, across(c("StartTime", "EndTime"), parsedate::parse_iso_8601)) %>%
+  dataset$InterpolationTypes <- try(dplyr::mutate(dataset$InterpolationTypes, dplyr::across(c("StartTime", "EndTime"), parsedate::parse_iso_8601)) %>%
     tibble::as_tibble())
 
   return(dataset)
@@ -193,8 +194,8 @@ getTimeSeries <- function(ts_id, start, end) {
 #' Get all corrected time series data at a location
 #'
 #' @param loc_ids A character vector of location identifiers
-#' @param parameters A character vector of parameters to include
-#' @param labels A character vector of labels to include
+#' @param parameters Optional. A character vector of parameters to include. Retrieves data for all parameters if omitted.
+#' @param labels Optional. A character vector of labels to include. Retrieves data for all labels if omitted.
 #' @inheritParams getTimeSeries
 #'
 #' @return A list of time series by location
@@ -240,9 +241,8 @@ getTimeSeriesByLocation <- function(loc_ids, parameters, labels, start, end) {
 #' Get all corrected time series data in a folder containing multiple locations
 #'
 #' @param folder Limit results to locations in this folder. You must use the full folder name (e.g. "National Park Service.Klamath Network", *not* "Klamath Network")
-#' @param parameters A character vector of parameters to include
-#' @param labels A character vector of labels to include
 #' @inheritParams getTimeSeries
+#' @inheritParams getTimeSeriesByLocation
 #' @inheritParams getLocationInfo
 #'
 #' @return A list of time series by location
