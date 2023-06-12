@@ -9,9 +9,9 @@ getTimeSeriesByLocation(loc_ids, parameters, labels, start, end)
 \arguments{
 \item{loc_ids}{A character vector of location identifiers}
 
-\item{parameters}{A character vector of parameters to include}
+\item{parameters}{Optional. A character vector of parameters to include. Retrieves data for all parameters if omitted.}
 
-\item{labels}{A character vector of labels to include}
+\item{labels}{Optional. A character vector of labels to include. Retrieves data for all labels if omitted.}
 
 \item{start}{Optional. Only retrieve data after and including this date/time. Can be an R POSIXct object, or a character string in ISO 8601 format (YYYY-MM-DDThh:mm:ss+/-hh:mm)}
 

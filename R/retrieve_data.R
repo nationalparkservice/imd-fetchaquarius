@@ -97,7 +97,7 @@ getLocationInfo <- function(search_string, folder, include_subfolders = TRUE) {
   loc_data <- httr::GET(paste0(url,'/GetLocationDescriptionList',sep=''))
   all_locs <- jsonlite::fromJSON(httr::content(loc_data,"text"))$LocationDescriptions
   all_locs <- tibble::as_tibble(all_locs) %>%
-    dplyr::mutate(LastModified = parsedate::parse_iso_8601(LastModified))
+    dplyr::mutate(LastModified = timeseries$parseIso8601(LastModified))
 
   if (!missing(search_string)) {
     all_locs <- all_locs %>%
@@ -145,7 +145,7 @@ getTimeSeriesInfo <- function(loc_ids) {
   }
   if (nrow(datasets) > 0) {
     datasets <- dplyr::arrange(datasets, LocationIdentifier, Parameter, Label) %>%
-      dplyr::mutate(dplyr::across(c("LastModified", "RawStartTime", "RawEndTime", "CorrectedStartTime", "CorrectedEndTime"), parsedate::parse_iso_8601))
+      dplyr::mutate(dplyr::across(c("LastModified", "RawStartTime", "RawEndTime", "CorrectedStartTime", "CorrectedEndTime"), timeseries$parseIso8601))
   }
 
   return(datasets)
@@ -171,21 +171,21 @@ getTimeSeries <- function(ts_id, start, end) {
   if ("Timestamp" %in% names(dataset$Points)) {
     dataset$Points <- dataset$Points %>%
       tibble::as_tibble() %>%
-      dplyr::mutate(Timestamp = parsedate::parse_iso_8601(Timestamp))
+      dplyr::mutate(Timestamp = timeseries$parseIso8601(Timestamp))
   }
 
-  dataset$TimeRange$StartTime <- try(parsedate::parse_iso_8601(dataset$TimeRange$StartTime))
-  dataset$TimeRange$EndTime <- try(parsedate::parse_iso_8601(dataset$TimeRange$EndTime))
-  dataset$ResponseTime <- try(parsedate::parse_iso_8601(dataset$ResponseTime))
-  dataset$Approvals <- try(dplyr::mutate(dataset$Approvals, dplyr::across(c("DateAppliedUtc", "StartTime", "EndTime"), parsedate::parse_iso_8601)) %>%
+  dataset$TimeRange$StartTime <- try(timeseries$parseIso8601(dataset$TimeRange$StartTime))
+  dataset$TimeRange$EndTime <- try(timeseries$parseIso8601(dataset$TimeRange$EndTime))
+  dataset$ResponseTime <- try(timeseries$parseIso8601(dataset$ResponseTime))
+  dataset$Approvals <- try(dplyr::mutate(dataset$Approvals, dplyr::across(c("DateAppliedUtc", "StartTime", "EndTime"), timeseries$parseIso8601)) %>%
     tibble::as_tibble())
-  dataset$Methods <- try(dplyr::mutate(dataset$Methods, dplyr::across(c("StartTime", "EndTime"), parsedate::parse_iso_8601)) %>%
+  dataset$Methods <- try(dplyr::mutate(dataset$Methods, dplyr::across(c("StartTime", "EndTime"), timeseries$parseIso8601)) %>%
     tibble::as_tibble())
-  dataset$Grades <- try(dplyr::mutate(dataset$Grades, dplyr::across(c("StartTime", "EndTime"), parsedate::parse_iso_8601)) %>%
+  dataset$Grades <- try(dplyr::mutate(dataset$Grades, dplyr::across(c("StartTime", "EndTime"), timeseries$parseIso8601)) %>%
     tibble::as_tibble())
-  dataset$GapTolerances <- try(dplyr::mutate(dataset$GapTolerances, dplyr::across(c("StartTime", "EndTime"), parsedate::parse_iso_8601)) %>%
+  dataset$GapTolerances <- try(dplyr::mutate(dataset$GapTolerances, dplyr::across(c("StartTime", "EndTime"), timeseries$parseIso8601)) %>%
     tibble::as_tibble())
-  dataset$InterpolationTypes <- try(dplyr::mutate(dataset$InterpolationTypes, dplyr::across(c("StartTime", "EndTime"), parsedate::parse_iso_8601)) %>%
+  dataset$InterpolationTypes <- try(dplyr::mutate(dataset$InterpolationTypes, dplyr::across(c("StartTime", "EndTime"), timeseries$parseIso8601)) %>%
     tibble::as_tibble())
 
   return(dataset)

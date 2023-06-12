@@ -280,17 +280,26 @@ timeseriesClient$methods(
     #
     # This function can process roughly 10K timestamps/sec.
     # By comparison, the popular-and-otherwise-correct lubridate library is 60x slower at ~ 150 timestamps per second
+    # len <- nchar(isoText)
+    #
+    # if (substr(isoText, len - 2, len - 2) == ":") {
+    #   # The most common scenario from AQTS output: A truly correct ISO 8601 timestamp with a numeric UTC offset
+    #   # Strip out the colon separating the UTC offset, since that is what %z requires
+    #   isoText <- paste0(substr(isoText, 1, len - 3), substr(isoText, len - 1, len))
+    # } else if (substr(isoText, len, len) == "Z") {
+    #   # Second most likely scenario from AQTS output: The "Z" representing a UTC time
+    #   # Convert the unsupported UTC shorthand into an offset with no effect
+    #   isoText <- paste0(substr(isoText, 1, len - 1), "+0000")
+    # }
+
     len <- nchar(isoText)
 
-    if (substr(isoText, len - 2, len - 2) == ":") {
-      # The most common scenario from AQTS output: A truly correct ISO 8601 timestamp with a numeric UTC offset
-      # Strip out the colon separating the UTC offset, since that is what %z requires
-      isoText <- paste0(substr(isoText, 1, len - 3), substr(isoText, len - 1, len))
-    } else if (substr(isoText, len, len) == "Z") {
-      # Second most likely scenario from AQTS output: The "Z" representing a UTC time
-      # Convert the unsupported UTC shorthand into an offset with no effect
-      isoText <- paste0(substr(isoText, 1, len - 1), "+0000")
-    }
+    isoText <- ifelse(substr(isoText, len - 2, len - 2) == ":",  # The most common scenario from AQTS output: A truly correct ISO 8601 timestamp with a numeric UTC offset
+                      paste0(substr(isoText, 1, len - 3), substr(isoText, len - 1, len)),  # Strip out the colon separating the UTC offset, since that is what %z requires
+                      ifelse(substr(isoText, len, len) == "Z",  # Second most likely scenario from AQTS output: The "Z" representing a UTC time
+                             isoText <- paste0(substr(isoText, 1, len - 1), "+0000"),  # Convert the unsupported UTC shorthand into an offset with no effect
+                             NA)
+                      )
 
     as.POSIXct(strptime(isoText, "%Y-%m-%dT%H:%M:%OS%z", "UTC"))
   }
