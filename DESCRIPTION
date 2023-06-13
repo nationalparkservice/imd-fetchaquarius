@@ -1,6 +1,6 @@
 Package: fetchaquarius
 Title: Import Aquarius Data into R
-Version: 0.0.0.9000
+Version: 0.1.0
 Authors@R: 
     person("Sarah", "Wright", , "sarah_wright@nps.gov", role = c("aut", "cre"),
            comment = c(ORCID = "0009-0004-5060-2189"))
