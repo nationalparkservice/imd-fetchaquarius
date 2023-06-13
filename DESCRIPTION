@@ -15,6 +15,5 @@ Imports:
     jsonlite,
     magrittr,
     methods,
-    parsedate,
     tibble
-URL: https://wright13.github.io/imd-fetchaquarius/
+URL: https://nationalparkservice.github.io/imd-fetchaquarius/
